@@ -1,0 +1,234 @@
+
+<%= include('entity-management') %>
+
+<script type="text/tmpl" id="elements_title">
+  <h2 class="entity-title"><%=t.profile_management.title%></h2>
+</script>
+
+<script type="text/tmpl" id="elements_description">
+  <%=t.profile_management.title%>
+</script>
+
+<!-- Renders the elements container -->
+<script type="text/tmpl" id="elements_container_template">
+  <table id="elements_table" class="table table-striped">
+     <thead class="table-header">
+       <tr>
+         <th class="table-header-title" scope="col" style="width:15%"><%=t.profile_management.table.username%></th>
+         <th class="table-header-title" scope="col" style="width:20%"><%=t.profile_management.table.full_name%></th>
+         <th class="table-header-title" scope="col" style="width:15%"><%=t.profile_management.table.email%></th>
+         <th class="table-header-title" scope="col" style="width:20%"><%=t.profile_management.table.member_since%></th>
+         <th class="table-header-title" scope="col" style="width:20%"><%=t.profile_management.table.last_access%></th>
+       </tr>
+     </thead>
+     <tbody id="elements_tbody" class="table-tbody">             
+     </tbody>
+  </table>
+
+</script>
+
+<!-- Renders one element in the elements list view -->
+        
+<script type="text/tmpl" id="elements_list_template">
+
+    <tr class="table-row element-navigation-detail" rel="<%%= index %>" id="element_row_<%%=index%>">
+      <td class="table-cell"><%%= entity.username %></td>
+      <td class="table-cell"><%%= entity.full_name %></td>
+      <td class="table-cell"><%%= entity.email %></td>
+      <td class="table-cell">
+          <%%if (!isNaN(new Date(entity.creation_date))) { %> 
+              <%%=new Date(entity.creation_date).toString('dd.MM.yyyy HH:mm')%>
+          <%% } %>
+      </td>    
+      <td class="table-cell">
+          <%%if (!isNaN(new Date(entity.last_access))) { %> 
+            <%%=new Date(entity.last_access).toString('dd.MM.yyyy HH:mm')%> 
+          <%% } %>
+      </td>  
+    </tr>
+
+</script>
+
+<!-- Renders one element in the element view (full detailed) -->
+
+<script type="text/tmpl" id="element_template">
+
+</script>
+
+<!-- Renders the form to edit an element -->
+
+<script type="text/tmpl" id="element_template_form">
+  <div class="content">
+
+    <div class="row">
+      <div class="col-sm-12 col-md-12">
+        <div class="block ">
+          <div class="block-header bg-gray-lighter">
+            <h3 class="block-title">Datos básicos</h3>
+          </div>
+          <div class="block-content">
+
+              <form name="element" id="profiles_management_form" class="form-horizontal">
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="username"><%=t.profile_management.form.username.label%><span class="mandatoryfield">*</span></label>
+                  <div class="col-xs-10">
+                    <input class="form-control" type="text" maxlength="20" id="username" name="username" <%% if (entity) { %> value="<%%= entity.username %>" <%% } %>>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="full_name"><%=t.profile_management.form.full_name.label%></label>
+                  <div class="col-xs-10">
+                    <input class="form-control" maxlength="60" id="full_name" name="full_name" <%% if (entity) { %> value="<%%= entity.full_name %>" <%% } %>>
+                  </div>
+                </div>             
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="email"><%=t.profile_management.form.email.label%></label>
+                  <div class="col-xs-10">
+                    <input class="form-control" maxlength="50" id="email" name="email" <%% if (entity) { %> value="<%%= entity.email %>" <%% } %>>
+                  </div>
+                </div>    
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="password"><%=t.profile_management.form.password.label%></label>
+                  <div class="col-xs-10">
+                    <input class="form-control" maxlength="20" id="password" name="password">
+                  </div>
+                </div>                     
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="confirm_password"><%=t.profile_management.form.confirm_password.label%></label>
+                  <div class="col-xs-10">
+                    <input class="form-control" maxlength="20" id="confirm_password" name="confirm_password">
+                  </div>
+                </div>  
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="confirm_password"><%=t.profile_management.form.confirm_password.label%></label>
+                  <div class="col-xs-10">
+                    <input class="form-control" maxlength="20" id="confirm_password" name="confirm_password">
+                  </div>
+                </div>  
+
+                <div class="form-group">
+                    <label class="col-xs-12">Tipo de usuario</label>
+                    <div class="col-xs-12" style="margin-left: 10px">
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_manager" name="user_type" value="manager" <%% if (entity && entity.user_type == 'manager') { %>checked<%%}%>> Manager
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_operator" name="user_type" value="operator" <%% if (entity && entity.user_type == 'operator') { %>checked<%%}%>> Operador
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_agency" name="user_type" value="webmaster" <%% if (entity && entity.user_type == 'webmaster') { %>checked<%%}%>> Webmaster
+                            </label>
+                        </div>                          
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_agency" name="user_type" value="charge_supplier" <%% if (entity && entity.user_type == 'charge_supplier') { %>checked<%%}%>> ERP Integración cobros
+                            </label>
+                        </div>                         
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_customer" name="user_type" value="customer" <%% if (entity && entity.user_type == 'customer') { %>checked<%%}%>> Cliente
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_supplier" name="user_type" value="supplier" <%% if (entity && entity.user_type == 'supplier') { %>checked<%%}%>> Proveedor
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_agent" name="user_type" value="agent" <%% if (entity && entity.user_type == 'agent') { %>checked<%%}%>> Agente
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label for="example-radio1">
+                                <input type="radio" id="user_type_agency" name="user_type" value="agency" <%% if (entity && entity.user_type == 'agency') { %>checked<%%}%>> Agencia
+                            </label>
+                        </div>                                                
+                    </div>
+                </div>                                
+
+                <div class="form-group">
+                  <div class="col-md-9">
+                      <%% if (entity) { %>
+                        <input type="button" class="btn btn-sm btn-primary update-entity-button action-button entity-management-button" value="<%=t.entitymanagement.update%>"/>
+                      <%% } else { %>
+                        <input type="button" class="btn btn-sm btn-primary create-entity-button action-button entity-management-button" value="<%=t.entitymanagement.create%>"/>
+                      <%% } %>
+                  </div>
+                </div>
+
+              </form>  
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%% if (entity) { %>
+    <div class="row">
+      <div class="col-sm-12 col-md-12">
+        <div class="block ">
+          <div class="block-header bg-gray-lighter">
+            <h3 class="block-title">API</h3>
+          </div>
+          <div class="block-content">
+
+              <form name="element" class="form-horizontal">
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="confirm_password"><%=t.profile_management.form.api_key.label%></label>
+                  <div class="col-xs-8">
+                    <input class="form-control" maxlength="48" id="api_key" name="api_key" readonly value="<%%= entity.api_key %>">
+                  </div>
+                  <div class="col-xs-2">
+                  <button class="btn btn-sm btn-primary element-action-button" id="generate_api_key_button" 
+                      data-action-method="POST"
+                      data-action-url="/api/user/<%%=entity.username%>/generate-api-key"
+                      data-confirm-message="<%=t.profile_management.form.api_key_generate_confirm.label%>">
+                      <%=t.profile_management.form.api_key_generate_button.label%>
+                  </button>
+                  </div>
+                </div> 
+
+                <div class="form-group">
+                  <label class="col-xs-10" for="confirm_password"><%=t.profile_management.form.secret_key.label%></label>
+                  <div class="col-xs-8">
+                    <input class="form-control" maxlength="48" id="api_secret" name="api_secret" readonly value="<%%= entity.api_secret %>">
+                  </div>
+                  <div class="col-xs-2">
+                  <button class="btn btn-sm btn-primary element-action-button" id="generate_api_key_button" 
+                      data-action-method="POST"
+                      data-action-url="/api/user/<%%=entity.username%>/generate-secret-key"
+                      data-confirm-message="<%=t.profile_management.form.secret_key_generate_confirm.label%>">
+                      <%=t.profile_management.form.secret_key_generate_button.label%>
+                  </button>
+                  </div>
+                </div> 
+
+              </form>
+
+          </div>
+        </div>
+      </div>
+    </div>    
+    <%% } %>  
+
+  </div>  
+
+              
+
+     
+
+</script>
+

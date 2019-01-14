@@ -1,0 +1,173 @@
+require(['jquery','YSDForms', "jquery.ui", 'jquery.formparams', 'jquery.toast', "autonumeric", "YSDjson2", "jquery.validate",
+         'jquery.ui.datepicker-es', 'jquery.ui.datepicker.validation'], function($, YSDForms) {
+
+  resourcesMaintenanceModel = {
+
+    updated_data: null,
+
+    update: function(form) {
+
+            var data = $(form).formParams(false);
+            
+            if (data.maintenance_official_revision_last_ok) {
+              data.maintenance_official_revision_last_ok = data.maintenance_official_revision_last_ok[data.maintenance_official_revision_last_ok.length-1];
+            }
+            
+            if (data.insurance_valid) {
+              data.insurance_valid = data.insurance_valid[data.insurance_valid.length-1];
+            }
+
+            var dataJSON = JSON.stringify(data);
+
+            $.ajax({
+                type: 'PUT',
+                url : '/api/booking-item',
+                data: dataJSON,
+                dataType : 'json',
+                contentType : 'application/json; charset=utf-8',
+                crossDomain: true,
+                success: function(data, textStatus, jqXHR) {
+                  resourcesMaintenanceModel.updated_data = data;
+                  resourcesMaintenanceView.update('booking_item_updated');
+                },
+                error: function(data, textStatus, jqXHR) {
+                  alert('Error actualizando datos');
+                },
+                complete: function(jqXHR, textStatus) {
+
+                }
+
+            });
+    }
+
+  };
+
+  resourcesMaintenanceController = {
+
+    editionControlChanged: function(control) {
+      resourcesMaintenanceModel.update(control.form);
+    }
+
+  };
+
+  resourcesMaintenanceView = {
+
+  	init: function() {
+      YSDForms.improve();
+      YSDForms.limit_text_area_content_size('.variable', 255);
+      this.setupDateControls();
+      this.setupEvents();
+      this.showTotals();
+  	},
+
+    setupDateControls: function() {
+
+      $('.date-control').datepicker({numberOfMonths:1, dateFormat: 'dd/mm/yy', defaultDate: ''}, "<%=session[:locale] || 'es'%>" );
+      $('.date-control').each(function(){
+        if ($(this).attr('data-value') != '') {
+          $(this).datepicker('setDate', $.datepicker.parseDate('yy-mm-dd', $(this).attr('data-value')));
+        }
+      });
+
+    },
+
+    setupEvents: function() {
+
+      $('.resource-form input, .resource-form textarea').bind('change', function(){
+        resourcesMaintenanceController.editionControlChanged($(this)[0]);
+      });
+
+    },
+
+    update: function(action) {
+            switch (action) {
+                case 'booking_item_updated':
+                    $.toast({
+                        heading: 'Datos actualizados',
+                        text: 'Los datos se han actulizado correctamente',
+                        position: 'top-right',
+                        bgColor: 'rgb(56, 154, 56)',
+                        textColor: 'white',
+                        loader: false,
+                        stack: false
+                    });
+
+                    if (resourcesMaintenanceModel.updated_data.maintenance_external_revision_warning) {
+                       $('#external_revision_'+resourcesMaintenanceModel.updated_data.reference).addClass('bg-danger-light'); 
+                    }
+                    else {
+                       $('#external_revision_'+resourcesMaintenanceModel.updated_data.reference).removeClass('bg-danger-light'); 
+                    }
+
+                    if (resourcesMaintenanceModel.updated_data.maintenance_official_revision_warning) {
+                       $('#official_revision_'+resourcesMaintenanceModel.updated_data.reference).addClass('bg-danger-light'); 
+                    }
+                    else {
+                       $('#official_revision_'+resourcesMaintenanceModel.updated_data.reference).removeClass('bg-danger-light'); 
+                    }
+
+                    if (!resourcesMaintenanceModel.updated_data.insurance_valid) {
+                       $('#insurances_'+resourcesMaintenanceModel.updated_data.reference).addClass('bg-warning-light'); 
+                       $('#insurances_'+resourcesMaintenanceModel.updated_data.reference).removeClass('bg-danger-light');
+                    }
+                    else if (resourcesMaintenanceModel.updated_data.insurance_end_date_warning) {
+                       $('#insurances_'+resourcesMaintenanceModel.updated_data.reference).addClass('bg-danger-light'); 
+                    }
+                    else {
+                       $('#insurances_'+resourcesMaintenanceModel.updated_data.reference).removeClass('bg-warning-light');
+                       $('#insurances_'+resourcesMaintenanceModel.updated_data.reference).removeClass('bg-danger-light');
+                    }
+                    this.showTotals();
+
+                    break;
+            }      
+    },
+
+    showTotals: function() {
+
+       var external_revision_warnings = $('#external_revisions_table tbody tr.bg-danger-light').length;
+       $('#external_revision_warnings').html(external_revision_warnings);
+       if (external_revision_warnings > 0){
+         $('#external_revision_warnings_container').addClass('bg-danger text-white');
+         $('#external_revision_warnings_container').removeClass('bg-gray-lighter'); 
+       }
+       else {
+         $('#external_revision_warnings_container').addClass('bg-gray-lighter'); 
+         $('#external_revision_warnings_container').removeClass('bg-danger text-white');
+       }
+
+       var official_revision_warnings = $('#official_revisions_table tbody tr.bg-danger-light').length;
+       $('#official_revision_warnings').html(official_revision_warnings);
+       if (official_revision_warnings > 0){
+         $('#official_revision_warnings_container').addClass('bg-danger text-white');
+         $('#official_revision_warnings_container').removeClass('bg-gray-lighter'); 
+       }
+       else {
+         $('#official_revision_warnings_container').addClass('bg-gray-lighter'); 
+         $('#official_revision_warnings_container').removeClass('bg-danger text-white');
+       }
+       $('#official_revision_warnings').html($('#official_revisions_table tbody tr.bg-danger-light').length);
+       
+       var expired_insurance_warnings = $('#insurances_table tbody tr.bg-danger-light').length;
+       $('#expired_insurance_warnings').html(expired_insurance_warnings);
+       if (expired_insurance_warnings > 0){
+         $('#expired_insurance_warnings_container').addClass('bg-danger text-white');
+         $('#expired_insurance_warnings_container').removeClass('bg-gray-lighter'); 
+       }
+       else {
+         $('#expired_insurance_warnings_container').addClass('bg-gray-lighter'); 
+         $('#expired_insurance_warnings_container').removeClass('bg-danger text-white');
+       }       
+       $('#expired_insurance_warnings').html($('#insurances_table tbody tr.bg-danger-light').length);
+
+       $('#insurance_count').html($('input[name=insurance_valid]:checked').length);
+       
+    }
+
+
+
+  };
+
+  resourcesMaintenanceView.init();
+  
+});

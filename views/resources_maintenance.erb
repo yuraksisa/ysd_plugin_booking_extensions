@@ -1,0 +1,249 @@
+<div class="top-navigation-bar">
+  <h2 class="entity-title">Mantenimiento de la flota</h2>
+</div>
+<div class="admin_content_wrapper"  style="background-color: #f5f5f5; margin: 0">
+
+  <br>
+
+  <div class="content content-boxed">
+
+
+    <div class="row">
+      <div class="col-sm-6 col-lg-3">
+          <a class="block block-bordered block-link-hover3 text-center" href="javascript:void(0)">
+              <div id="external_revision_warnings_container" class="block-content block-content-full bg-gray-lighter border-b">
+                  <div id="external_revision_warnings" class="h1 font-w700"></div>
+              </div>
+              <div class="block-content block-content-full block-content-mini">
+                  Revisiones los próximos 30 días
+              </div>
+          </a>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+          <a class="block block-bordered block-link-hover3 text-center" href="javascript:void(0)">
+              <div id="official_revision_warnings_container" class="block-content block-content-full bg-gray-lighter border-b">
+                  <div id="official_revision_warnings" class="h1 font-w700"></div>
+              </div>
+              <div class="block-content block-content-full block-content-mini">
+                  ITV vencidas los próximos 30 días
+              </div>
+          </a>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+          <a class="block block-bordered block-link-hover3 text-center" href="javascript:void(0)">
+              <div class="block-content block-content-full bg-gray-lighter border-b">
+                  <div id="insurance_count" class="h1 font-w700"></div>
+              </div>
+              <div class="block-content block-content-full block-content-mini">
+                  Vehículos asegurados
+              </div>
+          </a>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+          <a class="block block-bordered block-link-hover3 text-center" href="javascript:void(0)">
+              <div id="expired_insurance_warnings_container" class="block-content block-content-full bg-gray-lighter border-b">
+                  <div id="expired_insurance_warnings" class="h1 font-w700"></div>
+              </div>
+              <div class="block-content block-content-full block-content-mini">
+                  Seguro vencidos en los próximos 30 días
+              </div>
+          </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12 col-md-12">
+        <div class="block">
+
+          <ul class="nav nav-tabs" data-toggle="tabs">
+            <% if @booking_item_family.maintenance %>
+            <li class="active">
+              <a id="request_notification" href="#btabs-static-external-revisions">Revisiones</a>
+            </li>
+            <li class="">
+              <a id="confirmation_notification" href="#btabs-static-official-revisions">ITV</a>
+            </li>
+            <% end %>
+            <li class="">
+              <a id="request_payment_notification" href="#btabs-static-insurances">Seguro</a>
+            </li>
+          </ul>
+
+          <div class="block-content tab-content">
+
+            <!-- External revision -->
+            <div class="tab-pane active" id="btabs-static-external-revisions">
+
+            	<table id="external_revisions_table" class="table">
+            		<thead>
+                  <tr>
+                    <th>Vehículo</th>
+                    <th>Kms última revisión</th>
+                    <% if @booking_item_family.usage %>
+                    <th>Km actuales</th>
+                    <% end %>
+                    <th>Kms próxima revisión</th>                    
+                    <th>Última revisión</th>
+                    <th>Próxima revisión</th>
+                  </tr>  
+            		</thead>
+            		<tbody>
+                  <% @resources.each do |resource| %>
+                  <tr id="external_revision_<%=resource.reference%>" <% if resource.maintenance_external_revision_warning %>class="bg-danger-light"<%end%>>
+                    <td><strong><%=resource.reference%></strong></td>
+                    <td>
+                      <form name="maintenance_external_revision_last_units_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="number" size="5" name="maintenance_external_revision_last_units" class="form-control text-right" value="<%=resource.maintenance_external_revision_last_units%>"/>
+                      </form>  
+                    </td>                      
+                    <% if @booking_item_family.usage %>
+                    <td>
+                      <form name="usage_units_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="number" size="5" name="usage_units" class="form-control text-right" value="<%=resource.usage_units%>"/>
+                      </form>  
+                    </td>
+                    <% end %>
+                    <td>
+                      <form name="maintenance_external_revision_next_units_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="number" size="5" name="maintenance_external_revision_next_units" class="form-control text-right" value="<%=resource.maintenance_external_revision_next_units%>"/>
+                      </form>  
+                    </td>
+                    <td>
+                      <form name="maintenance_external_revision_last_date_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="maintenance_external_revision_last_date" class="form-control date-control" data-value="<%=resource.maintenance_external_revision_last_date ? resource.maintenance_external_revision_last_date.strftime('%Y-%m-%d') : ''%>"/>
+                      </form>                        
+                    </td>                    
+                    <td>
+                      <form name="maintenance_external_revision_next_date_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="maintenance_external_revision_next_date" class="form-control date-control" data-value="<%=resource.maintenance_external_revision_next_date ? resource.maintenance_external_revision_next_date.strftime('%Y-%m-%d') : ''%>"/>
+                      </form>  
+                    </td>           
+                  </tr>  
+                  <% end %>
+            		</tbody>	
+            	</table>	
+            </div>
+
+            <!-- Official revision -->
+            <div class="tab-pane" id="btabs-static-official-revisions">
+              <table id="official_revisions_table" class="table">
+                <thead>
+                  <tr>
+                    <th>Vehículo</th>
+                    <th>ITV anterior</th>
+                    <th class="text-center">Válida</th>
+                    <th>Comentarios</th>
+                    <th>ITV siguiente</th>
+                  </tr>  
+                </thead>
+                <tbody>
+                  <% @resources.each do |resource| %>
+                  <tr id="official_revision_<%=resource.reference%>" <% if resource.maintenance_official_revision_warning %>class="bg-danger-light"<%end%>>
+                    <td><strong><%=resource.reference%></strong></td>
+                    <td>
+                      <form name="maintenance_official_revision_last_date_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="maintenance_official_revision_last_date" class="form-control date-control" data-value="<%=resource.maintenance_official_revision_last_date ? resource.maintenance_official_revision_last_date.strftime('%Y-%m-%d') : ''%>"/>
+                      </form>   
+                    </td>               
+                    <td>
+                       <form name="maintenance_official_revision_last_ok_form" class="resource-form form-inline text-center">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <div class="checkbox">
+                           <label for="maintenance_official_revision_last_ok">
+                             <input type="hidden" name="maintenance_official_revision_last_ok" value="false">
+                             <input type="checkbox" name="maintenance_official_revision_last_ok" value="true" id="maintenance_official_revision_last_ok" <% if resource.maintenance_official_revision_last_ok %>checked<% end %>>  
+                           </label>
+                        </div>    
+                      </form>                       
+                    </td>
+                    <td>
+                      <form name="maintenance_official_revision_last_comments_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <textarea rows="2" cols="20" name="maintenance_official_revision_last_comments" style="width: 100%" class="form-control"><%=resource.maintenance_official_revision_last_comments%></textarea>
+                      </form>                         
+                    </td>
+                    <td>
+                      <form name="maintenance_official_revision_next_date_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="maintenance_official_revision_next_date" class="form-control date-control" data-value="<%=resource.maintenance_official_revision_next_date ? resource.maintenance_official_revision_next_date.strftime('%Y-%m-%d') : ''%>"/>
+                      </form>   
+                    </td>                        
+                  </tr>  
+                  <% end %>
+                </tbody>  
+              </table>  
+            </div>
+
+            <!-- Insurances -->
+            
+            <div class="tab-pane" id="btabs-static-insurances">
+              <table id="insurances_table" class="table">
+                <thead>
+                  <tr>
+                    <th>Vehículo</th>
+                    <th class="text-center">Asegurado</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Compañía aseguradora</th>
+                    <th>Número de póliza</th>                                                      
+                  </tr>  
+                </thead>
+                <tbody>
+                  <% @resources.each do |resource| %>
+                  <tr id="insurances_<%=resource.reference%>" 
+                      <%if !resource.insurance_valid %>class="bg-warning-light"<% elsif resource.insurance_end_date_warning %>class="bg-danger-light"<%end%>>
+                    <td><strong><%=resource.reference%></strong></td>
+                    <td>
+                      <form name="insurance_valid_form" class="resource-form form-inline text-center">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <div class="checkbox">
+                           <label for="insurance_valid">
+                             <input type="hidden" name="insurance_valid" value="false">
+                             <input type="checkbox" name="insurance_valid" id="insurance_valid" value="true" <% if resource.insurance_valid %>checked<% end %>>  
+                           </label>
+                        </div>    
+                      </form>  
+                    </td>
+                    <td>
+                      <form name="insurance_start_date_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="insurance_start_date" class="form-control date-control" data-value="<%=resource.insurance_start_date ? resource.insurance_start_date.strftime('%Y-%m-%d') : ''%>"/>
+                      </form>   
+                    </td>
+                    <td>
+                      <form name="insurance_end_date_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="insurance_end_date" class="form-control date-control" data-value="<%=resource.insurance_end_date ? resource.insurance_end_date.strftime('%Y-%m-%d') : ''%>"/>
+                      </form>                         
+                    </td>
+                    <td>
+                      <form name="insurance_company_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="insurance_company" class="form-control" value="<%=resource.insurance_company%>"/>
+                      </form>  
+                    </td>
+                    <td>
+                      <form name="insurance_policy_number_form" class="resource-form form-inline">
+                        <input type="hidden" name="reference" value="<%=resource.reference%>"/>
+                        <input type="text" name="insurance_policy_number" class="form-control" value="<%=resource.insurance_policy_number%>"/>
+                      </form>  
+                    </td>                                             
+                  </tr>  
+                  <% end %>
+                </tbody>  
+              </table>  
+            </div>              
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>  
+</div>           	

@@ -1,0 +1,112 @@
+require(['YSDEntityManagement', 'YSDRemoteDataSource', 'YSDListSelector','jquery'], function(EntityManagement, RemoteDataSource, ListSelector, $) {
+ 
+  function ProfilesHook() {
+ 	   
+    this.entityKey = function(entity) {
+      return entity.username;
+    }
+
+    this.onEdit = function(entity) {
+      $('#username').attr('readonly', true);
+      $('#full_name').focus();  	
+      this.configForm(entity);
+    };
+  
+    this.onNew = function() {
+  	  $('#username').focus();
+  	  this.configForm(null);
+    }
+    
+    this.configForm = function(entity) {
+      
+      // Configure the usergroups
+      var ugDataSource = new RemoteDataSource('/api/usergroups',{id:'group', description:'name'});
+      var ugValue = (entity&&entity.usergroups)?entity.usergroups.map(function(item){return item.group;}):[]; 
+      var ugSelector = new ListSelector('user_groups', 'usergroups[]', ugDataSource, ugValue );
+
+      this.configValidation();
+    	
+    }
+
+    this.adaptFormData = function(data) {
+      
+      data.usergroups = this.adaptUsergroups(data.usergroups); 
+      delete data['repeat_password'];
+      return data;  
+      
+    }
+
+    this.adaptUsergroups = function(usergroups) { /* It converts from an array of string (each is an usergroup group) to an array of ProfileGroup */
+      
+      var adaptedUsergroups = [];
+
+      for (idx in usergroups) {
+        adaptedUsergroups.push({'group': usergroups[idx]});
+      }
+
+      return adaptedUsergroups;
+
+    }    
+
+    this.configValidation = function() {
+
+         $.validator.addMethod(
+              "regexp",
+              function(value, element, regexp) {
+                var re = new RegExp(regexp);
+                return this.optional(element) || re.test(value);  
+              }, "Please check your input");
+
+         $('#profiles_management_form').validate({
+            
+            submitHandler: function(form) 
+            {
+               return false;
+            },
+                               
+            rules : { // rules
+                  'password': {
+                     required: true,  
+                     minlength : 6,
+                     regexp: '^[\\w|\\d]*$'
+                  },
+             
+                  'confirm_password': {
+                    equalTo: 'form[name=element] #password' 
+                  }
+            },
+            
+            messages : { // messages
+                 'password': {
+                   required: "<%= t.profile_form.validation.password_required %>",
+                   minlength: "<%= t.profile_form.validation.password_minlength %>",
+                   regexp: "<%= t.profile_form.validation.password_regexp %>" 
+                  },
+             
+                  'confirm_password': {
+                    equalTo: "<%= t.profile_form.validation.confirm_password_equalTo %>"
+                  }
+            }
+            
+          }
+         );
+
+    }
+
+
+  	
+  };
+  
+  var urls = { 
+  	           query_url  : '/api/booking/users',
+    	         create_url : '/api/booking/user',
+  	           update_url : '/api/booking/user',
+  	           delete_url : '/api/booking/user',
+  	           get_url    : '/api/booking/user'
+  	         };
+
+  var profilesHook = new ProfilesHook();
+  var profilesManager = new EntityManagement(urls, 'profile', 12, profilesHook, 
+     {prefix: '/admin/booking'});
+ 
+});
